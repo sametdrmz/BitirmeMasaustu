@@ -102,7 +102,7 @@ namespace projedeneme
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Masalar yüklenirken bir hata oluştu: " + ex.Message);
+                    //MessageBox.Show("Masalar yüklenirken bir hata oluştu: " + ex.Message);
                 }
             }
         }
@@ -161,7 +161,7 @@ namespace projedeneme
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Siparişler yüklenirken bir hata oluştu: " + ex.Message);
+                    //MessageBox.Show("Siparişler yüklenirken bir hata oluştu: " + ex.Message);
                 }
             }
         }
@@ -191,7 +191,7 @@ namespace projedeneme
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Siparişler yüklenirken bir hata oluştu: " + ex.Message);
+                        //MessageBox.Show("Siparişler yüklenirken bir hata oluştu: " + ex.Message);
                     }
                 }
             }
@@ -225,7 +225,7 @@ namespace projedeneme
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("Siparişler yüklenirken bir hata oluştu: " + ex.Message);
+                        //MessageBox.Show("Siparişler yüklenirken bir hata oluştu: " + ex.Message);
                     }
                 }
             }
@@ -263,7 +263,7 @@ namespace projedeneme
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show("Sipariş " + (action == "confirmOrder" ? "onaylanırken" : "iptal edilirken") + " bir hata oluştu: " + ex.Message);
+                            //MessageBox.Show("Sipariş " + (action == "confirmOrder" ? "onaylanırken" : "iptal edilirken") + " bir hata oluştu: " + ex.Message);
                         }
                     }
                 }

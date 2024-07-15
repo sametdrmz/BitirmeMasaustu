@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace projedeneme
 {
@@ -64,7 +65,7 @@ namespace projedeneme
                 }
                 else
                 {
-                    MessageBox.Show("Çalışanlar yüklenemedi.");
+                    //MessageBox.Show("Çalışanlar yüklenemedi.");
                 }
             }
         }
@@ -91,7 +92,7 @@ namespace projedeneme
                 }
                 else
                 {
-                    MessageBox.Show("Tablolar yüklenemedi.");
+                    //MessageBox.Show("Tablolar yüklenemedi.");
                 }
             }
         }
@@ -105,14 +106,27 @@ namespace projedeneme
             var password = textBox4.Text;
             var accountType = comboBox3.SelectedItem?.ToString();
 
-            if (accountType == "Roller" || accountType == null)
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(surname) || string.IsNullOrEmpty(position) || string.IsNullOrEmpty(userId)  || string.IsNullOrEmpty(password))
             {
-                MessageBox.Show("Lütfen geçerli bir rol seçin.");
+                MessageBox.Show("Lütfen bilgileri eksiksiz giriniz!");
                 return;
             }
 
-            var content = new FormUrlEncodedContent(new[]
+            else
             {
+                if (accountType == "Roller" || accountType == null)
+                {
+                    MessageBox.Show("Lütfen geçerli bir rol seçin!");
+                    return;
+                }
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(surname) || string.IsNullOrWhiteSpace(position) || string.IsNullOrWhiteSpace(userId))
+                {
+                    MessageBox.Show("Lütfen bilgileri eksiksiz giriniz!");
+                    return;
+                }
+
+                var content = new FormUrlEncodedContent(new[]
+                {
                 new KeyValuePair<string, string>("name", name),
                 new KeyValuePair<string, string>("surname", surname),
                 new KeyValuePair<string, string>("position", position),
@@ -121,27 +135,28 @@ namespace projedeneme
                 new KeyValuePair<string, string>("accountType", accountType)
             });
 
-            using (HttpClient client = new HttpClient())
-            {
-                HttpResponseMessage response = await client.PostAsync("http://localhost:8080/createEmployee", content);
-                if (response.IsSuccessStatusCode)
+                using (HttpClient client = new HttpClient())
                 {
-                    MessageBox.Show("Çalışan başarıyla oluşturuldu!");
-                    textBox1.Text = "";
-                    textBox2.Text = "";
-                    textBox3.Text = "";
-                    textBox4.Text = "";
-                    textBox5.Text = "";
-                    comboBox3.SelectedIndex = 0; 
-                    comboBox1.Items.Clear();
-                    employeeIds.Clear();
-                    LoadEmployeeIds();
+                    HttpResponseMessage response = await client.PostAsync("http://localhost:8080/createEmployee", content);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Çalışan başarıyla oluşturuldu!");
+                        textBox1.Text = "";
+                        textBox2.Text = "";
+                        textBox3.Text = "";
+                        textBox4.Text = "";
+                        textBox5.Text = "";
+                        comboBox3.SelectedIndex = 0;
+                        comboBox1.Items.Clear();
+                        employeeIds.Clear();
+                        LoadEmployeeIds();
+                    }
+                    else
+                    {
+                        //MessageBox.Show("Çalışan oluşturulamadı.");
+                    }
                 }
-                else
-                {
-                    MessageBox.Show("Çalışan oluşturulamadı.");
-                }
-            }
+            }      
         }
 
 
@@ -172,7 +187,7 @@ namespace projedeneme
                 }
                 else
                 {
-                    MessageBox.Show("Çalışan silinemedi.");
+                    //MessageBox.Show("Çalışan silinemedi.");
                 }
             }
         }
@@ -181,41 +196,49 @@ namespace projedeneme
         {
             var tableNumber = textBox7.Text;
 
-            var content = new FormUrlEncodedContent(new[]
+            if (IsValidInput(tableNumber, out string errorMessage))
+            {
+                var content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("tableNumber", tableNumber)
             });
 
-            using (HttpClient client = new HttpClient())
-            {
-                HttpResponseMessage response = await client.PostAsync("http://localhost:8080/createTable", content);
-                if (response.IsSuccessStatusCode)
+                using (HttpClient client = new HttpClient())
                 {
-                    MessageBox.Show("Tablo başarıyla oluşturuldu!");
-                    textBox7.Text = "";
-                    comboBox2.Items.Clear();
-                    tableIds.Clear();
-                    LoadTableNumbers();
-                }
-                else
-                {
-                    MessageBox.Show("Tablo oluşturulamadı.");
+                    HttpResponseMessage response = await client.PostAsync("http://localhost:8080/createTable", content);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show("Masa başarıyla oluşturuldu!");
+                        textBox7.Text = "";
+                        comboBox2.Items.Clear();
+                        tableIds.Clear();
+                        LoadTableNumbers();
+                    }
+                    else
+                    {
+                        //MessageBox.Show("Tablo oluşturulamadı.");
+                    }
                 }
             }
+            else
+            {
+                MessageBox.Show("Lütfen geçerli bir masa sayısı giriniz!");
+                return ;
+            }    
         }
 
         private async void button3_Click(object sender, EventArgs e)
         {
             if (comboBox2.SelectedItem == null || comboBox2.SelectedItem.ToString() == "Masalar")
             {
-                MessageBox.Show("Lütfen silinecek bir tablo seçin.");
+                MessageBox.Show("Lütfen silinecek bir masa seçin.");
                 return;
             }
 
             var selectedTableNumber = comboBox2.SelectedItem.ToString();
             if (!tableIds.TryGetValue(selectedTableNumber, out var tableId))
             {
-                MessageBox.Show("Geçersiz tablo seçildi.");
+                MessageBox.Show("Geçersiz masa seçildi.");
                 return;
             }
 
@@ -224,16 +247,37 @@ namespace projedeneme
                 HttpResponseMessage response = await client.DeleteAsync($"http://localhost:8080/deleteTable?tableId={tableId}");
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("Tablo başarıyla silindi!");
+                    MessageBox.Show("Masa başarıyla silindi!");
                     comboBox2.Items.Remove(selectedTableNumber);
                     tableIds.Remove(selectedTableNumber);
                     comboBox2.SelectedIndex = 0;
                 }
                 else
                 {
-                    MessageBox.Show("Tablo silinemedi.");
+                    //MessageBox.Show("Tablo silinemedi.");
                 }
             }
+        }
+
+        private bool IsValidInput(string input, out string errorMessage)
+        {
+            errorMessage = "";
+
+            // Check if the input is a number
+            if (!decimal.TryParse(input, out decimal number))
+            {
+                errorMessage = "Giriş bir sayı olmalıdır.";
+                return false;
+            }
+
+            // Check if the number is less than 0
+            if (number < 0)
+            {
+                errorMessage = "Giriş 0'dan küçük olamaz.";
+                return false;
+            }
+
+            return true;
         }
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)

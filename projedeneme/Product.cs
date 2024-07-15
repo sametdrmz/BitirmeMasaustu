@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Drawing;
+using System.Xml.Linq;
 
 namespace projedeneme
 {
@@ -37,29 +38,44 @@ namespace projedeneme
             string productName = textBox2.Text;
             string quantity = textBox3.Text;
 
-            var content = new FormUrlEncodedContent(new[]
+            if (string.IsNullOrWhiteSpace(productName) || string.IsNullOrWhiteSpace(quantity))
             {
-                new KeyValuePair<string, string>("productName", productName),
-                new KeyValuePair<string, string>("quantity", quantity)
-            });
+                MessageBox.Show("Lütfen geçerli bilgiler giriniz!");
+            }
 
-            using (var client = new HttpClient())
+            else
             {
-                var response = await client.PostAsync("http://localhost:8080/createProduct", content);
-
-                if (response.IsSuccessStatusCode)
+                if (IsValidInput(quantity, out string errorMessage))
                 {
-                    MessageBox.Show("Ürün başarıyla oluşturuldu!");
-                    textBox2.Text = "";
-                    textBox3.Text = "";
-                    await LoadProductsAsync();
-                    InitializeDataGridView();
-                    LoadDataFromApi();
+                    var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("productName", productName),
+                    new KeyValuePair<string, string>("quantity", quantity)
+                });
+
+                    using (var client = new HttpClient())
+                    {
+                        var response = await client.PostAsync("http://localhost:8080/createProduct", content);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            MessageBox.Show("Ürün başarıyla oluşturuldu!");
+                            textBox2.Text = "";
+                            textBox3.Text = "";
+                            await LoadProductsAsync();
+                            InitializeDataGridView();
+                            LoadDataFromApi();
+                        }
+                        else
+                        {
+                            //MessageBox.Show("Hata oluştu: " + response.ReasonPhrase);
+                        }
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Hata oluştu: " + response.ReasonPhrase);
-                }
+                    MessageBox.Show("Lütfen geçerli bir miktar giriniz!");
+                }               
             }
         }
 
@@ -82,7 +98,7 @@ namespace projedeneme
                     }
                     else
                     {
-                        MessageBox.Show("Hata oluştu: " + response.ReasonPhrase);
+                        //MessageBox.Show("Hata oluştu: " + response.ReasonPhrase);
                     }
                 }
             }
@@ -99,29 +115,36 @@ namespace projedeneme
                 int selectedProductId = productIds[comboBox1.SelectedIndex - 1];
                 string amount = textBox7.Text;
 
-                var content = new FormUrlEncodedContent(new[]
+                if (IsValidInput(amount, out string errorMessage))
+                {
+                    var content = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("productId", selectedProductId.ToString()),
                     new KeyValuePair<string, string>("amount", amount)
                 });
 
-                using (var client = new HttpClient())
-                {
-                    var response = await client.PostAsync("http://localhost:8080/increaseProductQuantity", content);
+                    using (var client = new HttpClient())
+                    {
+                        var response = await client.PostAsync("http://localhost:8080/increaseProductQuantity", content);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Ürün miktarı başarıyla artırıldı!");
-                        textBox7.Text = "";
-                        await LoadProductsAsync();
-                        InitializeDataGridView();
-                        LoadDataFromApi();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Hata oluştu: " + response.ReasonPhrase);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            MessageBox.Show("Ürün miktarı başarıyla artırıldı!");
+                            textBox7.Text = "";
+                            await LoadProductsAsync();
+                            InitializeDataGridView();
+                            LoadDataFromApi();
+                        }
+                        else
+                        {
+                            //MessageBox.Show("Hata oluştu: " + response.ReasonPhrase);
+                        }
                     }
                 }
+                else
+                {
+                    MessageBox.Show("Lütfen geçerli bir miktar giriniz!");
+                }               
             }
             else
             {
@@ -136,28 +159,35 @@ namespace projedeneme
                 int selectedProductId = productIds[comboBox2.SelectedIndex - 1];
                 string amount = textBox1.Text;
 
-                var content = new FormUrlEncodedContent(new[]
+                if (IsValidInput(amount, out string errorMessage))
+                {
+                    var content = new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("productId", selectedProductId.ToString()),
                     new KeyValuePair<string, string>("usageAmount", amount)
                 });
 
-                using (var client = new HttpClient())
-                {
-                    var response = await client.PostAsync("http://localhost:8080/reduceProductQuantity", content);
+                    using (var client = new HttpClient())
+                    {
+                        var response = await client.PostAsync("http://localhost:8080/reduceProductQuantity", content);
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Ürün miktarı başarıyla azaltıldı!");
-                        textBox1.Text = "";
-                        await LoadProductsAsync();
-                        InitializeDataGridView();
-                        LoadDataFromApi();
+                        if (response.IsSuccessStatusCode)
+                        {
+                            MessageBox.Show("Ürün miktarı başarıyla azaltıldı!");
+                            textBox1.Text = "";
+                            await LoadProductsAsync();
+                            InitializeDataGridView();
+                            LoadDataFromApi();
+                        }
+                        else
+                        {
+                            //MessageBox.Show("Hata oluştu: " + response.ReasonPhrase);
+                        }
                     }
-                    else
-                    {
-                        MessageBox.Show("Hata oluştu: " + response.ReasonPhrase);
-                    }
+                }
+                else
+                {
+                    MessageBox.Show("Lütfen geçerli bir miktar giriniz!");
                 }
             }
             else
@@ -191,7 +221,7 @@ namespace projedeneme
                 }
                 else
                 {
-                    MessageBox.Show("Ürünler getirilirken hata oluştu: " + response.ReasonPhrase);
+                    //MessageBox.Show("Ürünler getirilirken hata oluştu: " + response.ReasonPhrase);
                 }
             }
 
@@ -232,17 +262,34 @@ namespace projedeneme
                     }
                     else
                     {
-                        MessageBox.Show("API'den veri alınamadı.");
+                        //MessageBox.Show("API'den veri alınamadı.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Hata: " + ex.Message);
+                //MessageBox.Show("Hata: " + ex.Message);
             }
         }
 
+        private bool IsValidInput(string input, out string errorMessage)
+        {
+            errorMessage = "";
 
+            if (!decimal.TryParse(input, out decimal number))
+            {
+                errorMessage = "Giriş bir sayı olmalıdır.";
+                return false;
+            }
+
+            if (number < 0)
+            {
+                errorMessage = "Giriş 0'dan küçük olamaz.";
+                return false;
+            }
+
+            return true;
+        }
         private void InitializeDataGridView()
         {
             dataGridView1.ColumnCount = 6;

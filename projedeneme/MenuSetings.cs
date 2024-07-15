@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using Newtonsoft.Json;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
@@ -121,7 +122,7 @@ namespace projedeneme
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Hata: " + ex.Message);
+                    //MessageBox.Show("Hata: " + ex.Message);
                 }
             }
         }
@@ -181,7 +182,7 @@ namespace projedeneme
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Hata: " + ex.Message);
+                    //MessageBox.Show("Hata: " + ex.Message);
                 }
             }
         }
@@ -230,7 +231,7 @@ namespace projedeneme
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Hata: " + ex.Message);
+                    //MessageBox.Show("Hata: " + ex.Message);
                 }
             }
         }
@@ -242,7 +243,7 @@ namespace projedeneme
             {
                 string categoryName = textBox1.Text;
 
-                if (string.IsNullOrEmpty(categoryName))
+                if (string.IsNullOrWhiteSpace(categoryName))
                 {
                     MessageBox.Show("Kategori adı boş geçilemez.");
                     return;
@@ -270,7 +271,7 @@ namespace projedeneme
             }
             catch (Exception ex)
             {
-                MessageBox.Show("API'ye veri gönderilirken bir hata oluştu: " + ex.Message);
+                //MessageBox.Show("API'ye veri gönderilirken bir hata oluştu: " + ex.Message);
             }
         }
 
@@ -309,13 +310,13 @@ namespace projedeneme
                     else
                     {
                         string result = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("Kategori silinemedi. Hata: " + result);
+                        //MessageBox.Show("Kategori silinemedi. Hata: " + result);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Kategori silinirken hata oluştu: " + ex.Message);
+                //MessageBox.Show("Kategori silinirken hata oluştu: " + ex.Message);
             }
         }
 
@@ -398,95 +399,113 @@ namespace projedeneme
                 string categoryName = textBox2.Text.Trim();
                 int categoryId = selectedCategoryId;
 
+
                 if (string.IsNullOrEmpty(categoryName) || categoryId == 0)
                 {
                     MessageBox.Show("Lütfen güncellemek için bir kategori seçiniz.");
                     return;
                 }
 
-                var updateCategoryUrl = $"http://localhost:8080/updateCategory?id={categoryId}";
-
-                var content = new FormUrlEncodedContent(new[]
+                if (string.IsNullOrEmpty(categoryName))
                 {
+                    MessageBox.Show("Lütfen geçerli bilgiler giriniz!");
+                    return;
+                }
+
+                else
+                {
+                    var updateCategoryUrl = $"http://localhost:8080/updateCategory?id={categoryId}";
+
+                    var content = new FormUrlEncodedContent(new[]
+                    {
                     new KeyValuePair<string, string>("name", categoryName)
                 });
 
-                using (HttpClient client = new HttpClient())
-                {
-                    HttpResponseMessage response = await client.PutAsync(updateCategoryUrl, content);
-
-                    if (response.IsSuccessStatusCode)
+                    using (HttpClient client = new HttpClient())
                     {
-                        MessageBox.Show("Kategori başarıyla güncellendi.");
+                        HttpResponseMessage response = await client.PutAsync(updateCategoryUrl, content);
 
-                        LoadCategories();
-                        LoadCategoriesToComboBox();
-                        LoadMenusToComboBox();
-                        textBox2.Text = "";
+                        if (response.IsSuccessStatusCode)
+                        {
+                            MessageBox.Show("Kategori başarıyla güncellendi.");
+
+                            LoadCategories();
+                            LoadCategoriesToComboBox();
+                            LoadMenusToComboBox();
+                            textBox2.Text = "";
+                        }
+                        else
+                        {
+                            string result = await response.Content.ReadAsStringAsync();
+                            //MessageBox.Show("Kategori güncellenemedi. Hata: " + result);
+                        }
                     }
-                    else
-                    {
-                        string result = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("Kategori güncellenemedi. Hata: " + result);
-                    }
-                }
+                }              
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Kategori güncellenirken hata oluştu: " + ex.Message);
+                //MessageBox.Show("Kategori güncellenirken hata oluştu: " + ex.Message);
             }
         }
 
         private async void button4_Click(object sender, EventArgs e)
         {
-            try
+            if (string.IsNullOrWhiteSpace(textBox3.Text) || string.IsNullOrWhiteSpace(textBox4.Text) || string.IsNullOrWhiteSpace(textBox5.Text))
             {
-                string name = textBox3.Text;
-                decimal price = decimal.Parse(textBox4.Text);
-                decimal expense = decimal.Parse(textBox5.Text);
-                int categoryId = categoryDictionary[comboBox3.SelectedItem.ToString()];
+                MessageBox.Show("Lütfen geçerli bilgiler giriniz!");
+            }
 
-                if (string.IsNullOrEmpty(name) || price <= 0 || expense <= 0 || categoryId == 0)
+            else 
+            {
+                try
                 {
-                    MessageBox.Show("Lütfen geçerli bilgiler giriniz.");
-                    return;
-                }
+                    string name = textBox3.Text;
+                    decimal price = decimal.Parse(textBox4.Text);
+                    decimal expense = decimal.Parse(textBox5.Text);
+                    int categoryId = categoryDictionary[comboBox3.SelectedItem.ToString()];
 
-                var content = new FormUrlEncodedContent(new[]
-                {
+                    if (string.IsNullOrEmpty(name) || price <= 0 || expense <= 0 || categoryId == 0)
+                    {
+                        MessageBox.Show("Lütfen geçerli bilgiler giriniz!");
+                        return;
+                    }
+
+                    var content = new FormUrlEncodedContent(new[]
+                    {
                     new KeyValuePair<string, string>("name", name),
                     new KeyValuePair<string, string>("price", price.ToString()),
                     new KeyValuePair<string, string>("expense", expense.ToString()),
                     new KeyValuePair<string, string>("categoryId", categoryId.ToString())
                 });
 
-                var createMenuUrl = "http://localhost:8080/createMenu";
+                    var createMenuUrl = "http://localhost:8080/createMenu";
 
-                using (HttpClient client = new HttpClient())
-                {
-                    HttpResponseMessage response = await client.PostAsync(createMenuUrl, content);
-
-                    if (response.IsSuccessStatusCode)
+                    using (HttpClient client = new HttpClient())
                     {
-                        MessageBox.Show("Menü başarıyla oluşturuldu.");
+                        HttpResponseMessage response = await client.PostAsync(createMenuUrl, content);
 
-                        LoadCategories();
-                        LoadCategoriesToComboBox();
-                        LoadMenusToComboBox();
-                        textBox3.Text = "";
-                        textBox4.Text = "";
-                        textBox5.Text = "";
-                    }
-                    else
-                    {
-                        string result = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("Menü oluşturulamadı. Hata: " + result);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            MessageBox.Show("Menü başarıyla oluşturuldu.");
+
+                            LoadCategories();
+                            LoadCategoriesToComboBox();
+                            LoadMenusToComboBox();
+                            textBox3.Text = "";
+                            textBox4.Text = "";
+                            textBox5.Text = "";
+                        }
+                        else
+                        {
+                            string result = await response.Content.ReadAsStringAsync();
+                            //MessageBox.Show("Menü oluşturulamadı. Hata: " + result);
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Menü oluşturulurken bir hata oluştu: " + ex.Message);
+                catch (Exception ex)
+                {
+                    //MessageBox.Show("Menü oluşturulurken bir hata oluştu: " + ex.Message);
+                }
             }
         }
 
@@ -525,46 +544,54 @@ namespace projedeneme
                     else
                     {
                         string result = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("Menü silinemedi. Hata: " + result);
+                        //MessageBox.Show("Menü silinemedi. Hata: " + result);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Menü silinirken hata oluştu: " + ex.Message);
+                //MessageBox.Show("Menü silinirken hata oluştu: " + ex.Message);
             }
         }
 
         private async void button6_Click(object sender, EventArgs e)
         {
-            try
+            if (string.IsNullOrEmpty(textBox6.Text) || string.IsNullOrEmpty(textBox7.Text) || string.IsNullOrEmpty(textBox8.Text))
             {
-                string name = textBox6.Text;
+                MessageBox.Show("Lütfen geçerli bilgiler giriniz!");
+                return;
+            }
 
-                if (!double.TryParse(textBox7.Text, out double price))
+            else
+            {
+                try
                 {
-                    MessageBox.Show("Lütfen geçerli bir fiyat giriniz.");
-                    return;
-                }
+                    string name = textBox6.Text;
 
-                if (!double.TryParse(textBox8.Text, out double expense))
-                {
-                    MessageBox.Show("Lütfen geçerli bir gider giriniz.");
-                    return;
-                }
+                    if (!double.TryParse(textBox7.Text, out double price))
+                    {
+                        MessageBox.Show("Lütfen geçerli bir fiyat giriniz.");
+                        return;
+                    }
 
-                int selectedMenuId = menuDictionary[comboBox5.SelectedItem.ToString()];
+                    if (!double.TryParse(textBox8.Text, out double expense))
+                    {
+                        MessageBox.Show("Lütfen geçerli bir gider giriniz.");
+                        return;
+                    }
 
-                int categoryId = categoryDictionary[comboBox6.SelectedItem.ToString()];
+                    int selectedMenuId = menuDictionary[comboBox5.SelectedItem.ToString()];
 
-                if (string.IsNullOrEmpty(name) || price <= 0 || expense <= 0 || categoryId == 0)
-                {
-                    MessageBox.Show("Lütfen geçerli bilgiler giriniz.");
-                    return;
-                }
+                    int categoryId = categoryDictionary[comboBox6.SelectedItem.ToString()];
 
-                var content = new FormUrlEncodedContent(new[]
-                {
+                    if (string.IsNullOrEmpty(name) || price <= 0 || expense <= 0 || categoryId == 0)
+                    {
+                        MessageBox.Show("Lütfen geçerli bilgiler giriniz.");
+                        return;
+                    }
+
+                    var content = new FormUrlEncodedContent(new[]
+                    {
                     new KeyValuePair<string, string>("id", selectedMenuId.ToString()),
                     new KeyValuePair<string, string>("name", name),
                     new KeyValuePair<string, string>("price", price.ToString()),
@@ -572,34 +599,36 @@ namespace projedeneme
                     new KeyValuePair<string, string>("categoryId", categoryId.ToString())
                 });
 
-                var updateMenuUrl = "http://localhost:8080/updateMenu";
+                    var updateMenuUrl = "http://localhost:8080/updateMenu";
 
-                using (HttpClient client = new HttpClient())
-                {
-                    HttpResponseMessage response = await client.PutAsync(updateMenuUrl, content);
-
-                    if (response.IsSuccessStatusCode)
+                    using (HttpClient client = new HttpClient())
                     {
-                        MessageBox.Show("Menü başarıyla güncellendi.");
+                        HttpResponseMessage response = await client.PutAsync(updateMenuUrl, content);
 
-                        LoadCategories();
-                        LoadCategoriesToComboBox();
-                        LoadMenusToComboBox();
-                        textBox6.Text = "";
-                        textBox7.Text = "";
-                        textBox8.Text = "";
-                    }
-                    else
-                    {
-                        string result = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("Menü güncellenemedi. Hata: " + result);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            MessageBox.Show("Menü başarıyla güncellendi.");
+
+                            LoadCategories();
+                            LoadCategoriesToComboBox();
+                            LoadMenusToComboBox();
+                            textBox6.Text = "";
+                            textBox7.Text = "";
+                            textBox8.Text = "";
+                        }
+                        else
+                        {
+                            string result = await response.Content.ReadAsStringAsync();
+                            //MessageBox.Show("Menü güncellenemedi. Hata: " + result);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Lütfen geçerli bilgiler giriniz. ");
+                }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Lütfen geçerli bilgiler giriniz. ");
-            }
+            
         }
 
 
@@ -641,13 +670,13 @@ namespace projedeneme
                     else
                     {
                         string result = await response.Content.ReadAsStringAsync();
-                        MessageBox.Show("Menü durumu güncellenemedi. Hata: " + result);
+                        //MessageBox.Show("Menü durumu güncellenemedi. Hata: " + result);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Menü durumu güncellenirken bir hata oluştu: " + ex.Message);
+                //MessageBox.Show("Menü durumu güncellenirken bir hata oluştu: " + ex.Message);
             }
         }
 

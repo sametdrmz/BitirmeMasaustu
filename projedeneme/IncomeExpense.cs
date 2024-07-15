@@ -132,7 +132,7 @@ namespace projedeneme
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Veri çekme sırasında bir hata oluştu: " + ex.Message);
+                //MessageBox.Show("Veri çekme sırasında bir hata oluştu: " + ex.Message);
             }
         }
 

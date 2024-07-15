@@ -75,12 +75,12 @@ namespace projedeneme
                     }
                     else
                     {
-                        MessageBox.Show("API'den veri alınamadı.");
+                        //MessageBox.Show("API'den veri alınamadı.");
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Hata: {ex.Message}");
+                    //MessageBox.Show($"Hata: {ex.Message}");
                 }
             }
         }
@@ -105,7 +105,7 @@ namespace projedeneme
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Hata: {ex.Message}");
+                //MessageBox.Show($"Hata: {ex.Message}");
             }
         }
 
@@ -132,7 +132,7 @@ namespace projedeneme
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Hata: {ex.Message}");
+                //MessageBox.Show($"Hata: {ex.Message}");
             }
         }
 

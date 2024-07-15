@@ -28,5 +28,13 @@ namespace projedeneme
 
             panel1.Controls.Add(kitchenDisplayUserControl);
         }
+
+        private void oKapat_Click(object sender, EventArgs e)
+        {
+            Form1 form1 = new Form1();
+            this.Hide();
+            form1.ShowDialog();
+            this.Close();
+        }
     }
 }

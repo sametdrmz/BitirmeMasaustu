@@ -55,7 +55,7 @@ namespace projedeneme
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Tabloları yüklerken hata oluştu: " + ex.Message);
+                    //MessageBox.Show("Tabloları yüklerken hata oluştu: " + ex.Message);
                 }
             }
         }
@@ -216,7 +216,7 @@ namespace projedeneme
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Masa taşıma işleminde hata oluştu: " + ex.Message);
+                    //MessageBox.Show("Masa taşıma işleminde hata oluştu: " + ex.Message);
                 }
             }
         }
